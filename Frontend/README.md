@@ -7,25 +7,23 @@ Built using React (Vite).
 
 ## 📁 Folder Structure
 
-Frontend/
-│
-├── public/              → Static assets
-├── src/
-│   ├── assets/          → Images, icons
-│   ├── components/      → Reusable UI components
-│   ├── pages/           → Application pages (Home, Dashboard, etc.)
-│   ├── services/        → API calls to backend
-│   ├── hooks/           → Custom React hooks
-│   ├── context/         → Global state management
-│   ├── utils/           → Helper functions
-│   └── App.jsx          → Root component
-│
-├── index.html
-├── package.json
-├── vite.config.js
-└── .gitignore
+```
+backend
+ ├── src
+ │   ├── ai_models      → ML models / Python scripts
+ │   ├── config         → DB config, cloud config, environment setup
+ │   ├── controllers    → Request & response handling
+ │   ├── middleware     → Auth, error handling, file uploads
+ │   ├── services       → Core business logic & AI processing
+ │   ├── uploads        → Temporary uploaded files
+ │   └── utils          → Helper functions
+ │
+ ├── server.js          → Entry point
+ ├── package.json       → Dependencies
+ ├── .env               → Environment variables (not committed)
+ └── .gitignore
+```
 
----
 
 ## 🌐 Application Flow
 
