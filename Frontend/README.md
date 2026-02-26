@@ -1,16 +1,69 @@
-# React + Vite
+# 🎨 MediAI Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend application of MediAI.
+Built using React (Vite).
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📁 Folder Structure
 
-## React Compiler
+Frontend/
+│
+├── public/              → Static assets
+├── src/
+│   ├── assets/          → Images, icons
+│   ├── components/      → Reusable UI components
+│   ├── pages/           → Application pages (Home, Dashboard, etc.)
+│   ├── services/        → API calls to backend
+│   ├── hooks/           → Custom React hooks
+│   ├── context/         → Global state management
+│   ├── utils/           → Helper functions
+│   └── App.jsx          → Root component
+│
+├── index.html
+├── package.json
+├── vite.config.js
+└── .gitignore
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🌐 Application Flow
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Page → Component → API Service → Backend
+
+- Pages manage layout
+- Components are reusable UI elements
+- Services handle API communication
+- Context manages global state
+
+---
+
+## ⚙️ Setup Instructions
+
+1. Install dependencies
+   npm install
+
+2. Start development server
+   npm run dev
+
+3. Build for production
+   npm run build
+
+---
+
+## 📌 Rules for Contributors
+
+- Keep components reusable.
+- API calls must be inside services folder.
+- No direct backend URLs inside components.
+- Use environment variables for API base URL.
+- Follow clean component structure.
+
+---
+
+## 🔥 Coding Standards
+
+- Use functional components.
+- Use hooks properly.
+- Keep components small & modular.
+- Use consistent naming conventions.
