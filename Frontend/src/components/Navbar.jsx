@@ -6,9 +6,15 @@ function Navbar() {
       <Link to="/">
         <div className="flex items-center gap-2">
           <span className="text-blue-600 text-xl font-bold">➕</span>
-          <h1 className="text-xl font-semibold text-blue-700">MediAI</h1>
+          <h1 className="text-xl font-semibold text-blue-700 tracking-tight">MediAI</h1>
         </div>
       </Link>
+
+      <div className="hidden md:flex gap-8 font-medium text-sm text-slate-600">
+        <Link to="/symptom-checker" className="hover:text-blue-600 transition-colors">Symptom Checker</Link>
+        <Link to="/medicine-checker" className="hover:text-blue-600 transition-colors">Medicine Checker</Link>
+        <Link to="/mental-health-support" className="hover:text-teal-600 transition-colors">Mental Health</Link>
+      </div>
 
       <div className="flex gap-3">
         <Link to="/login">

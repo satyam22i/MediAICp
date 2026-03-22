@@ -4,6 +4,7 @@ import MedicineChecker from "./pages/MedicineChecker.jsx";
 import MedicalAnalysis from "./pages/MedicalAnalysis.jsx"
 import Login from "./pages/Login.jsx"
 import Signup from "./pages/Signup.jsx"
+import MentalHealthSupport from "./pages/MentalHealthSupport.jsx"
 
 import "./App.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -26,6 +27,10 @@ function App() {
     {
       path: "/medical-analysis",
       element: <MedicalAnalysis />,
+    },
+    {
+      path: "/mental-health-support",
+      element: <MentalHealthSupport />,
     },{
       path:"/login",
       element:<Login / >,
