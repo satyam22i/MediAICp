@@ -18,7 +18,7 @@ export default function VerifyEmail() {
       }
 
       try {
-        const response = await fetch(`http://localhost:5000/api/auth/verify-email?token=${token}`);
+        const response = await fetch(`https://mediai-1hpm.onrender.com/api/auth/verify-email?token=${token}`);
         const data = await response.json();
 
         if (response.ok) {

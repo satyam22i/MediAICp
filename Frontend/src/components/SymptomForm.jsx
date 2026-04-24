@@ -40,7 +40,7 @@ function SymptomForm() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/symptom/check", {
+      const response = await fetch("https://mediai-1hpm.onrender.com/api/symptom/check", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

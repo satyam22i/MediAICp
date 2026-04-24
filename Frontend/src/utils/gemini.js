@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:5000/api/ai";
+const API_BASE_URL = "https://mediai-1hpm.onrender.com/api/ai";
 
 const getAuthHeaders = () => {
   const user = JSON.parse(localStorage.getItem("userInfo"));

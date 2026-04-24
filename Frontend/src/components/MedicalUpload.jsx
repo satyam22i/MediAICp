@@ -70,7 +70,7 @@ function MedicalUpload() {
         formData.append("textData", textData);
       }
 
-      const response = await fetch("http://localhost:5000/api/medical/analyze", {
+      const response = await fetch("https://mediai-1hpm.onrender.com/api/medical/analyze", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
