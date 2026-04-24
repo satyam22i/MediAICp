@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 import Navbar from "../components/Navbar";
@@ -14,6 +14,12 @@ function Signup() {
     agreeToTerms: false,
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("userInfo")) {
+      navigate("/");
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -196,37 +202,7 @@ function Signup() {
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center my-6">
-            <div className="flex-1 border-t border-gray-300"></div>
-            <span className="px-4 text-gray-500 text-sm">Or Sign up with</span>
-            <div className="flex-1 border-t border-gray-300"></div>
-          </div>
 
-          {/* Social buttons */}
-          <div className="flex justify-center gap-4 mb-6">
-            <button
-              onClick={() => handleSocialSignup("Facebook")}
-              className="w-12 h-12 bg-[#1877F2] text-white rounded-lg hover:bg-[#166FE5] transition flex items-center justify-center shadow-md"
-              title="Sign up with Facebook"
-            >
-              <FaFacebookF className="text-xl" />
-            </button>
-            <button
-              onClick={() => handleSocialSignup("Instagram")}
-              className="w-12 h-12 bg-gradient-to-br from-[#833AB4] via-[#FD1D1D] to-[#F77737] text-white rounded-lg hover:opacity-90 transition flex items-center justify-center shadow-md"
-              title="Sign up with Instagram"
-            >
-              <FaInstagram className="text-xl" />
-            </button>
-            <button
-              onClick={() => handleSocialSignup("LinkedIn")}
-              className="w-12 h-12 bg-[#0A66C2] text-white rounded-lg hover:bg-[#004182] transition flex items-center justify-center shadow-md"
-              title="Sign up with LinkedIn"
-            >
-              <FaLinkedinIn className="text-xl" />
-            </button>
-          </div>
 
           {/* Login link */}
           <p className="text-center text-sm text-gray-600">

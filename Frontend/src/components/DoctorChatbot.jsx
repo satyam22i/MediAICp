@@ -40,18 +40,25 @@ export default function DoctorChatbot({ selectedPart }) {
   const handleSend = async (textToSend) => {
     if (!textToSend.trim() || !chatSession || isLoading) return;
 
+    // Map existing messages (excluding the first initial greeting from the model) to Gemini history format
+    const history = messages.slice(1).map(msg => ({
+      role: msg.role === "model" ? "model" : "user",
+      parts: [{ text: msg.text }]
+    }));
+
     const userMessage = { role: "user", text: textToSend };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
-      const result = await chatSession.sendMessage(textToSend);
-      setMessages((prev) => [...prev, { role: "model", text: result.response.text() }]);
+      const result = await chatSession.sendMessage(textToSend, history);
+      const cleanText = result.response.text().replace(/\*\*/g, '');
+      setMessages((prev) => [...prev, { role: "model", text: cleanText }]);
     } catch (error) {
       setMessages((prev) => [
         ...prev,
-        { role: "model", text: "Dr. AI is currently offline. Please try again later." },
+        { role: "model", text: "MediAI is offline. Please try again later." },
       ]);
     } finally {
       setIsLoading(false);
@@ -65,7 +72,7 @@ export default function DoctorChatbot({ selectedPart }) {
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl pointer-events-none"></div>
 
       {/* Header */}
-      <div className="bg-white/40 backdrop-blur-md border-b border-white/60 px-8 py-5 flex items-center gap-4 relative z-10">
+      <div className="border-b border-white/60 px-8 py-5 flex items-center gap-4 relative z-10">
         <div className="relative">
           <div className="bg-gradient-to-tr from-blue-600 to-indigo-500 p-3 rounded-2xl text-white shadow-lg shadow-blue-500/30">
             <Activity className="animate-pulse" size={24} />

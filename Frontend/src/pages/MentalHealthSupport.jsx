@@ -3,9 +3,17 @@ import Navbar from "../components/Navbar";
 import MentalHealthBot from "../components/MentalHealthBot";
 import { ArrowLeft, Heart, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 function MentalHealthSupport() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+    if (!userInfo) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col">

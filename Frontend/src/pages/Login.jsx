@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
 
@@ -11,6 +11,12 @@ function Login() {
     rememberMe: false,
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("userInfo")) {
+      navigate("/");
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -46,10 +52,7 @@ function Login() {
 
       if (response.ok) {
         toast.success("Login successful!");
-        // Store token if provided
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-        }
+        localStorage.setItem("userInfo", JSON.stringify(data));
         navigate("/");
       } else {
         toast.error(data.message || "Login failed");
@@ -128,9 +131,9 @@ function Login() {
                 />
                 Remember me
               </label>
-              <a href="#" className="text-blue-600 hover:underline">
+              <Link to="/forgot-password" className="text-blue-600 hover:underline">
                 Forgot Password?
-              </a>
+              </Link>
             </div>
 
             {/* Login Button */}

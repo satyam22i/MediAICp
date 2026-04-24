@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Send, User, HeartHandshake } from "lucide-react";
-import { createDoctorSession } from "../utils/gemini";
+import { createDoctorSession, detectCrisis } from "../utils/gemini";
 
 export default function MentalHealthBot() {
   const [messages, setMessages] = useState([
@@ -31,20 +31,39 @@ export default function MentalHealthBot() {
   }, [messages]);
 
   const handleSend = async (textToSend) => {
-    if (!textToSend.trim() || !chatSession || isLoading) return;
+    if (!textToSend.trim() || isLoading) return;
+
+    const history = messages.slice(1).map(msg => ({
+      role: msg.role === "model" ? "model" : "user",
+      parts: [{ text: msg.text }]
+    }));
 
     const userMessage = { role: "user", text: textToSend };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
+
+    // Crisis Detection
+    if (detectCrisis(textToSend)) {
+      setMessages((prev) => [
+        ...prev,
+        { 
+          role: "model", 
+          text: "I hear that you're going through a very difficult time. Please know that you're not alone and there is help available. If you're in immediate danger, please contact emergency services or reach out to a crisis helpline immediately:\n\n- National Suicide Prevention Lifeline: 988\n- Crisis Text Line: Text HOME to 741741\n\nYour safety is the most important thing." 
+        },
+      ]);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const result = await chatSession.sendMessage(textToSend);
-      setMessages((prev) => [...prev, { role: "model", text: result.response.text() }]);
+      const result = await chatSession.sendMessage(textToSend, history);
+      const cleanText = result.response.text().replace(/\*\*/g, '');
+      setMessages((prev) => [...prev, { role: "model", text: cleanText }]);
     } catch (error) {
       setMessages((prev) => [
         ...prev,
-        { role: "model", text: "I'm sorry, I couldn't reach my network connection. Please try again." },
+        { role: "model", text: "MediAI is offline. Please try again later." },
       ]);
     } finally {
       setIsLoading(false);

@@ -1,6 +1,13 @@
 import { Link } from "react-router-dom";
 
 function Navbar() {
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+  const logoutHandler = () => {
+    localStorage.removeItem("userInfo");
+    window.location.reload();
+  };
+
   return (
     <nav className="flex justify-between items-center px-10 py-4 bg-white shadow-sm">
       <Link to="/">
@@ -17,17 +24,31 @@ function Navbar() {
       </div>
 
       <div className="flex gap-3">
-        <Link to="/login">
-          <button className="px-4 py-2 bg-gray-100 rounded-md text-gray-700 hover:bg-gray-200">
-            Log In
-          </button>
-        </Link>
+        {userInfo ? (
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-semibold text-slate-700">Hi, {userInfo.name}</span>
+            <button 
+              onClick={logoutHandler}
+              className="px-4 py-2 bg-red-50 text-red-600 rounded-md hover:bg-red-100 font-medium transition-colors"
+            >
+              Log Out
+            </button>
+          </div>
+        ) : (
+          <>
+            <Link to="/login">
+              <button className="px-4 py-2 bg-gray-100 rounded-md text-gray-700 hover:bg-gray-200">
+                Log In
+              </button>
+            </Link>
 
-        <Link to="/signup">
-          <button className="px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-800">
-            Sign Up
-          </button>
-        </Link>
+            <Link to="/signup">
+              <button className="px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-800">
+                Sign Up
+              </button>
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );

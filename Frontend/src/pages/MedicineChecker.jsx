@@ -2,9 +2,17 @@ import Navbar from "../components/Navbar";
 import MedicineUpload from "../components/MedicineUpload";
 import { ArrowLeft, Target, ShieldCheck, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 function MedicineChecker() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+    if (!userInfo) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50/50 via-slate-50 to-blue-50/50 font-sans text-slate-800 relative overflow-hidden">
@@ -16,22 +24,7 @@ function MedicineChecker() {
         <Navbar />
       </div>
 
-      {/* Header */}
-      <div className="border-b border-white/60 bg-white/60 backdrop-blur-xl sticky top-0 z-30 shadow-[0_4px_30px_rgb(0,0,0,0.04)]">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <button
-            onClick={() => navigate("/")}
-            className="text-slate-500 hover:text-blue-600 flex items-center gap-2 font-medium transition-colors"
-          >
-            <ArrowLeft size={18} />
-            Back to Home
-          </button>
-          <h2 className="font-bold text-xl tracking-tight text-slate-800">
-            Medicine Identifier & Analyser
-          </h2>
-          <div className="w-[100px]"></div> {/* Spacer for centering */}
-        </div>
-      </div>
+
 
       <div className="max-w-7xl mx-auto px-6 py-12">
         

@@ -5,6 +5,9 @@ import MedicalAnalysis from "./pages/MedicalAnalysis.jsx"
 import Login from "./pages/Login.jsx"
 import Signup from "./pages/Signup.jsx"
 import MentalHealthSupport from "./pages/MentalHealthSupport.jsx"
+import VerifyEmail from "./pages/VerifyEmail.jsx"
+import ForgotPassword from "./pages/ForgotPassword.jsx"
+import ResetPassword from "./pages/ResetPassword.jsx"
 
 import "./App.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -31,12 +34,26 @@ function App() {
     {
       path: "/mental-health-support",
       element: <MentalHealthSupport />,
-    },{
-      path:"/login",
-      element:<Login / >,
-    },{
-      path:"/signup",
-      element:<Signup / >,
+    },
+    {
+      path: "/login",
+      element: <Login />,
+    },
+    {
+      path: "/signup",
+      element: <Signup />,
+    },
+    {
+      path: "/verify-email",
+      element: <VerifyEmail />,
+    },
+    {
+      path: "/forgot-password",
+      element: <ForgotPassword />,
+    },
+    {
+      path: "/reset-password",
+      element: <ResetPassword />,
     }
   ]);
 
