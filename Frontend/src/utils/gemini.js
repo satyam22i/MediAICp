@@ -1,4 +1,4 @@
-import { AI_ENDPOINTS } from '../config/api.js';
+const API_BASE_URL = "https://mediai-1hpm.onrender.com/api/ai";
 
 const getAuthHeaders = () => {
   const user = JSON.parse(localStorage.getItem("userInfo"));
@@ -12,8 +12,8 @@ export const createDoctorSession = (type = "symptoms") => {
   // We'll simulate a session by keeping history in the component
   return {
     sendMessage: async (message, history = []) => {
-      const endpoint = type === "MENTAL_HEALTH" ? AI_ENDPOINTS.mentalHealth : AI_ENDPOINTS.symptoms;
-      const response = await fetch(endpoint, {
+      const endpoint = type === "MENTAL_HEALTH" ? "/mental-health" : "/symptoms";
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify({ message, history }),
@@ -47,7 +47,7 @@ export const analyzeMedicine = async (text, file) => {
     });
   }
 
-  const response = await fetch(AI_ENDPOINTS.medicine, {
+  const response = await fetch(`${API_BASE_URL}/medicine`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify({ text, image: imageData }),

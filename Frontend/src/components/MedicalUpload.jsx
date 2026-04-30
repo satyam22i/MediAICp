@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { FaCloudUploadAlt, FaFileUpload } from "react-icons/fa";
 import toast from "react-hot-toast";
-import { LEGACY_ENDPOINTS } from "../config/api";
 import xray from "../assets/download.jpg";
 
 function MedicalUpload() {
@@ -71,7 +70,7 @@ function MedicalUpload() {
         formData.append("textData", textData);
       }
 
-      const response = await fetch(LEGACY_ENDPOINTS.medicalAnalyze, {
+      const response = await fetch("https://mediai-1hpm.onrender.com/api/medical/analyze", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

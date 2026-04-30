@@ -11,18 +11,6 @@ export default function MedicineUpload() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
 
-  const normalizeResultValue = (value) => {
-    if (value === null || value === undefined) return "N/A";
-    if (typeof value === "string") return value;
-    if (Array.isArray(value)) return value.join(", ");
-    if (typeof value === "object") {
-      return Object.entries(value)
-        .map(([key, nested]) => `${key}: ${normalizeResultValue(nested)}`)
-        .join(" | ");
-    }
-    return String(value);
-  };
-
   const handleUpload = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -146,8 +134,8 @@ export default function MedicineUpload() {
                 <Pill size={24} />
               </div>
               <div>
-                <h4 className="text-xl font-bold text-slate-800">{result.medicineName ? normalizeResultValue(result.medicineName) : "Unknown Medicine"}</h4>
-                <p className="text-slate-500 text-sm font-medium">{normalizeResultValue(result.genericName)}</p>
+                <h4 className="text-xl font-bold text-slate-800">{result.medicineName || "Unknown Medicine"}</h4>
+                <p className="text-slate-500 text-sm font-medium">{result.genericName}</p>
               </div>
             </div>
 
@@ -156,7 +144,7 @@ export default function MedicineUpload() {
                 <FileText className="text-slate-400 shrink-0 mt-1" size={20} />
                 <div>
                   <h5 className="font-semibold text-slate-700 uppercase tracking-wider text-xs mb-1">Uses</h5>
-                  <p className="text-slate-600 font-medium leading-relaxed">{normalizeResultValue(result.uses)}</p>
+                  <p className="text-slate-600 font-medium leading-relaxed">{result.uses || "N/A"}</p>
                 </div>
               </div>
 
@@ -164,7 +152,7 @@ export default function MedicineUpload() {
                 <Layers className="text-slate-400 shrink-0 mt-1" size={20} />
                 <div>
                   <h5 className="font-semibold text-slate-700 uppercase tracking-wider text-xs mb-1">Recommended Dosage</h5>
-                  <p className="text-slate-600 font-medium leading-relaxed">{normalizeResultValue(result.dosage)}</p>
+                  <p className="text-slate-600 font-medium leading-relaxed">{result.dosage || "N/A"}</p>
                 </div>
               </div>
 
@@ -172,7 +160,7 @@ export default function MedicineUpload() {
                 <Activity className="text-slate-400 shrink-0 mt-1" size={20} />
                 <div>
                   <h5 className="font-semibold text-slate-700 uppercase tracking-wider text-xs mb-1">Side Effects</h5>
-                  <p className="text-slate-600 font-medium leading-relaxed">{normalizeResultValue(result.sideEffects)}</p>
+                  <p className="text-slate-600 font-medium leading-relaxed">{result.sideEffects || "N/A"}</p>
                 </div>
               </div>
 
@@ -181,7 +169,7 @@ export default function MedicineUpload() {
                   <AlertTriangle className="text-yellow-600 shrink-0 mt-0.5" size={20} />
                   <div>
                     <h5 className="font-semibold text-yellow-800 mb-1">Important Warnings</h5>
-                    <p className="text-yellow-700 text-sm leading-relaxed">{normalizeResultValue(result.warnings)}</p>
+                    <p className="text-yellow-700 text-sm leading-relaxed">{result.warnings}</p>
                   </div>
                 </div>
               )}
