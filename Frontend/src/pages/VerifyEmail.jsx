@@ -38,26 +38,26 @@ export default function VerifyEmail() {
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50 flex flex-col">
       <Navbar />
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="bg-white max-w-md w-full rounded-2xl shadow-xl p-10 text-center border border-slate-100">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6">
+        <div className="bg-white max-w-md w-full rounded-2xl shadow-xl p-6 sm:p-10 text-center border border-slate-100">
           {status === 'verifying' && (
             <div className="flex flex-col items-center">
-              <Loader2 className="w-16 h-16 text-blue-600 animate-spin mb-4" />
-              <h2 className="text-2xl font-bold text-slate-800 mb-2">Verifying your email</h2>
-              <p className="text-slate-500">Please wait while we confirm your account...</p>
+              <Loader2 className="w-12 sm:w-16 h-12 sm:h-16 text-blue-600 animate-spin mb-3 sm:mb-4" />
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2">Verifying your email</h2>
+              <p className="text-slate-500 text-sm sm:text-base">Please wait while we confirm your account...</p>
             </div>
           )}
 
           {status === 'success' && (
             <div className="flex flex-col items-center">
-              <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
-              <h2 className="text-2xl font-bold text-slate-800 mb-2">Email Verified!</h2>
-              <p className="text-slate-500 mb-8">Your account has been successfully activated. You can now login to access all features.</p>
+              <CheckCircle className="w-12 sm:w-16 h-12 sm:h-16 text-green-500 mb-3 sm:mb-4" />
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2">Email Verified!</h2>
+              <p className="text-slate-500 text-sm sm:text-base mb-6 sm:mb-8">Your account has been successfully activated. You can now login to access all features.</p>
               <button
                 onClick={() => navigate('/login')}
-                className="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-lg hover:bg-blue-700 transition-all"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-3 sm:py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all text-sm sm:text-base"
               >
                 Go to Login
               </button>
@@ -66,12 +66,12 @@ export default function VerifyEmail() {
 
           {status === 'error' && (
             <div className="flex flex-col items-center">
-              <XCircle className="w-16 h-16 text-red-500 mb-4" />
-              <h2 className="text-2xl font-bold text-slate-800 mb-2">Verification Failed</h2>
-              <p className="text-slate-500 mb-8">The verification link is invalid or has expired. Please try signing up again or contact support.</p>
+              <XCircle className="w-12 sm:w-16 h-12 sm:h-16 text-red-500 mb-3 sm:mb-4" />
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-800 mb-2">Verification Failed</h2>
+              <p className="text-slate-500 text-sm sm:text-base mb-6 sm:mb-8">The verification link is invalid or has expired. Please try signing up again or contact support.</p>
               <button
                 onClick={() => navigate('/signup')}
-                className="w-full bg-slate-800 text-white font-bold py-3.5 rounded-xl shadow-lg hover:bg-slate-900 transition-all"
+                className="w-full bg-gradient-to-r from-slate-800 to-slate-900 text-white font-bold py-3 sm:py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all text-sm sm:text-base"
               >
                 Back to Signup
               </button>
