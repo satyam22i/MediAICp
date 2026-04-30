@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
+import { AUTH_ENDPOINTS } from "../config/api";
 
 function ForgotPassword() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ function ForgotPassword() {
     setLoading(true);
 
     try {
-      const response = await fetch("https://mediai-1hpm.onrender.com/api/auth/forgot-password", {
+      const response = await fetch(AUTH_ENDPOINTS.forgotPassword, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

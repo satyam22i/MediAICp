@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { AUTH_ENDPOINTS } from '../config/api';
 
 export default function VerifyEmail() {
   const [searchParams] = useSearchParams();
@@ -18,7 +19,7 @@ export default function VerifyEmail() {
       }
 
       try {
-        const response = await fetch(`https://mediai-1hpm.onrender.com/api/auth/verify-email?token=${token}`);
+        const response = await fetch(`${AUTH_ENDPOINTS.verifyEmail}?token=${token}`);
         const data = await response.json();
 
         if (response.ok) {

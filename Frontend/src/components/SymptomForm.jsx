@@ -1,5 +1,6 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { LEGACY_ENDPOINTS } from "../config/api";
 
 function SymptomForm() {
   const [formData, setFormData] = useState({
@@ -40,7 +41,7 @@ function SymptomForm() {
     setLoading(true);
 
     try {
-      const response = await fetch("https://mediai-1hpm.onrender.com/api/symptom/check", {
+      const response = await fetch(LEGACY_ENDPOINTS.symptomCheck, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

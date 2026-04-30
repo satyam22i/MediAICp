@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
+import { AUTH_ENDPOINTS } from "../config/api";
 
 function Login() {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch("https://mediai-1hpm.onrender.com/api/auth/login", {
+      const response = await fetch(AUTH_ENDPOINTS.login, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

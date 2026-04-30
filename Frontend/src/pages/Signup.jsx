@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
+import { AUTH_ENDPOINTS } from "../config/api";
 
 function Signup() {
   const navigate = useNavigate();
@@ -55,7 +56,7 @@ function Signup() {
     setLoading(true);
 
     try {
-      const response = await fetch("https://mediai-1hpm.onrender.com/api/auth/signup", {
+      const response = await fetch(AUTH_ENDPOINTS.signup, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -70,7 +71,7 @@ function Signup() {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success("Account created successfully!");
+        toast.success("Account created successfully! Check your email to verify.");
         navigate("/login");
       } else {
         toast.error(data.message || "Signup failed");

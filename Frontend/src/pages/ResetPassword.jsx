@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
+import { AUTH_ENDPOINTS } from "../config/api";
 
 function ResetPassword() {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ function ResetPassword() {
     setLoading(true);
 
     try {
-      const response = await fetch("https://mediai-1hpm.onrender.com/api/auth/reset-password", {
+      const response = await fetch(AUTH_ENDPOINTS.resetPassword, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
