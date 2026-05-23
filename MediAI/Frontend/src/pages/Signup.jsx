@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa";
+import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
+import { AUTH_ENDPOINTS } from "../config/api";
 
 function Signup() {
   const navigate = useNavigate();
@@ -14,6 +14,7 @@ function Signup() {
     agreeToTerms: false,
   });
   const [loading, setLoading] = useState(false);
+  const [slowServer, setSlowServer] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem("userInfo")) {
@@ -54,9 +55,18 @@ function Signup() {
     }
 
     setLoading(true);
+    setSlowServer(false);
+
+    // Show "server waking up" message after 5 seconds (Render cold start)
+    const slowTimer = setTimeout(() => {
+      setSlowServer(true);
+    }, 5000);
 
     try {
-      const response = await fetch("https://mediai-1hpm.onrender.com/api/auth/signup", {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
+      const response = await fetch(AUTH_ENDPOINTS.signup, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -66,53 +76,57 @@ function Signup() {
           email: formData.email,
           password: formData.password,
         }),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
       const data = await response.json();
 
       if (response.ok) {
-        toast.success("Account created successfully!");
+        toast.success(data.message || "Account created! Please check your email to verify your account.");
         navigate("/login");
       } else {
-        toast.error(data.message || "Signup failed");
+        toast.error(data.message || "Signup failed. Please try again.");
       }
     } catch (error) {
-      toast.error("Network error. Please try again.");
+      if (error.name === "AbortError") {
+        toast.error("Request timed out. The server may be starting up — please try again.");
+      } else {
+        toast.error("Network error. Please check your connection and try again.");
+      }
       console.error("Signup error:", error);
     } finally {
+      clearTimeout(slowTimer);
       setLoading(false);
+      setSlowServer(false);
     }
   };
 
-  const handleSocialSignup = (platform) => {
-    toast.info(`${platform} signup coming soon!`);
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
       <Navbar />
 
       {/* Center container */}
-      <div className="flex justify-center items-center py-16 px-4">
+      <div className="flex justify-center items-center py-8 sm:py-12 md:py-16 px-4">
         {/* Card */}
-        <div className="bg-white w-[480px] rounded-xl shadow-lg px-10 py-10">
+        <div className="bg-white w-full max-w-sm sm:max-w-md rounded-xl shadow-lg px-6 sm:px-10 py-10">
           {/* Logo and Header */}
           <div className="flex flex-col items-center mb-8">
             <div className="flex items-center gap-2 text-blue-600 text-xl font-bold mb-3">
               <span className="text-3xl">➕</span>
-              <span className="text-2xl">MediAI</span>
+              <span className="text-xl sm:text-2xl">MediAI</span>
             </div>
-            <h2 className="text-xl font-bold text-gray-800 mb-1">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-1 text-center">
               Create Your Account
             </h2>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 text-xs sm:text-sm text-center">
               Empowering Healthcare with AI Technology
             </p>
           </div>
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Full Name input */}
-            <div className="relative mb-4">
+            <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
                 👤
               </span>
@@ -122,12 +136,12 @@ function Signup() {
                 placeholder="Full Name"
                 value={formData.fullName}
                 onChange={handleChange}
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg py-3.5 pl-11 pr-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-gray-700"
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 sm:py-3.5 pl-11 pr-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm sm:text-base text-gray-700"
               />
             </div>
 
             {/* Email input */}
-            <div className="relative mb-4">
+            <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
                 ✉️
               </span>
@@ -137,12 +151,12 @@ function Signup() {
                 placeholder="E-mail Address"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg py-3.5 pl-11 pr-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-gray-700"
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 sm:py-3.5 pl-11 pr-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm sm:text-base text-gray-700"
               />
             </div>
 
             {/* Password input */}
-            <div className="relative mb-4">
+            <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
                 🔒
               </span>
@@ -152,12 +166,12 @@ function Signup() {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg py-3.5 pl-11 pr-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-gray-700"
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 sm:py-3.5 pl-11 pr-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm sm:text-base text-gray-700"
               />
             </div>
 
             {/* Confirm Password input */}
-            <div className="relative mb-4">
+            <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
                 🔒
               </span>
@@ -167,12 +181,12 @@ function Signup() {
                 placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full bg-gray-50 border border-gray-300 rounded-lg py-3.5 pl-11 pr-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-gray-700"
+                className="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 sm:py-3.5 pl-11 pr-4 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-sm sm:text-base text-gray-700"
               />
             </div>
 
             {/* Terms checkbox */}
-            <div className="flex items-start gap-2 mb-6">
+            <div className="flex items-start gap-2 pt-2">
               <input
                 type="checkbox"
                 name="agreeToTerms"
@@ -180,7 +194,7 @@ function Signup() {
                 onChange={handleChange}
                 className="w-4 h-4 mt-1 accent-blue-600 cursor-pointer"
               />
-              <label className="text-sm text-gray-600">
+              <label className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                 I agree to the{" "}
                 <a href="#" className="text-blue-600 hover:underline">
                   terms of service
@@ -196,23 +210,28 @@ function Signup() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md disabled:bg-blue-400 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 sm:py-3.5 rounded-lg font-semibold hover:shadow-lg transition-all text-sm sm:text-base disabled:from-blue-400 disabled:to-blue-400 disabled:cursor-not-allowed"
             >
-              {loading ? "Creating Account..." : "Sign Up"}
+              {loading ? (slowServer ? "⏳ Server starting up..." : "Creating Account...") : "Sign Up"}
             </button>
+
+            {/* Cold start warning */}
+            {slowServer && (
+              <p className="text-center text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-1">
+                🔄 Server is waking up (free tier). This may take up to 30 seconds — please wait...
+              </p>
+            )}
           </form>
 
-
-
           {/* Login link */}
-          <p className="text-center text-sm text-gray-600">
+          <p className="text-center text-xs sm:text-sm text-gray-600 mt-6">
             Already have an account?{" "}
-            <a
-              href="/login"
+            <Link
+              to="/login"
               className="text-blue-600 font-medium hover:underline"
             >
               Login
-            </a>
+            </Link>
           </p>
         </div>
       </div>

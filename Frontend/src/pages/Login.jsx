@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
+import { AUTH_ENDPOINTS } from "../config/api";
 
 function Login() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ function Login() {
     rememberMe: false,
   });
   const [loading, setLoading] = useState(false);
+  const [slowServer, setSlowServer] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem("userInfo")) {
@@ -35,9 +37,18 @@ function Login() {
     }
 
     setLoading(true);
+    setSlowServer(false);
+
+    // Show "server waking up" message after 5 seconds (Render cold start)
+    const slowTimer = setTimeout(() => {
+      setSlowServer(true);
+    }, 5000);
 
     try {
-      const response = await fetch("https://mediai-1hpm.onrender.com/api/auth/login", {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
+      const response = await fetch(AUTH_ENDPOINTS.login, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -46,22 +57,33 @@ function Login() {
           email: formData.email,
           password: formData.password,
         }),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
       const data = await response.json();
 
       if (response.ok) {
         toast.success("Login successful!");
         localStorage.setItem("userInfo", JSON.stringify(data));
         navigate("/");
+      } else if (response.status === 401) {
+        // Could be unverified email OR wrong credentials
+        toast.error(data.message || "Invalid email or password");
       } else {
-        toast.error(data.message || "Login failed");
+        toast.error(data.message || "Login failed. Please try again.");
       }
     } catch (error) {
-      toast.error("Network error. Please try again.");
+      if (error.name === "AbortError") {
+        toast.error("Request timed out. The server may be starting up — please try again.");
+      } else {
+        toast.error("Network error. Please check your connection and try again.");
+      }
       console.error("Login error:", error);
     } finally {
+      clearTimeout(slowTimer);
       setLoading(false);
+      setSlowServer(false);
     }
   };
 
@@ -142,8 +164,15 @@ function Login() {
               disabled={loading}
               className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 sm:py-3.5 rounded-lg font-semibold hover:shadow-lg transition-all text-sm sm:text-base disabled:from-blue-400 disabled:to-blue-400 disabled:cursor-not-allowed"
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? (slowServer ? "⏳ Server starting up..." : "Logging in...") : "Login"}
             </button>
+
+            {/* Cold start warning */}
+            {slowServer && (
+              <p className="text-center text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-1">
+                🔄 Server is waking up (free tier). This may take up to 30 seconds — please wait...
+              </p>
+            )}
           </form>
 
           {/* Signup link */}

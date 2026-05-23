@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import toast from "react-hot-toast";
+import { AUTH_ENDPOINTS } from "../config/api";
 
 function Signup() {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ function Signup() {
     agreeToTerms: false,
   });
   const [loading, setLoading] = useState(false);
+  const [slowServer, setSlowServer] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem("userInfo")) {
@@ -53,9 +55,18 @@ function Signup() {
     }
 
     setLoading(true);
+    setSlowServer(false);
+
+    // Show "server waking up" message after 5 seconds (Render cold start)
+    const slowTimer = setTimeout(() => {
+      setSlowServer(true);
+    }, 5000);
 
     try {
-      const response = await fetch("https://mediai-1hpm.onrender.com/api/auth/signup", {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
+      const response = await fetch(AUTH_ENDPOINTS.signup, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,21 +76,29 @@ function Signup() {
           email: formData.email,
           password: formData.password,
         }),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
       const data = await response.json();
 
       if (response.ok) {
-        toast.success("Account created successfully!");
+        toast.success(data.message || "Account created! Please check your email to verify your account.");
         navigate("/login");
       } else {
-        toast.error(data.message || "Signup failed");
+        toast.error(data.message || "Signup failed. Please try again.");
       }
     } catch (error) {
-      toast.error("Network error. Please try again.");
+      if (error.name === "AbortError") {
+        toast.error("Request timed out. The server may be starting up — please try again.");
+      } else {
+        toast.error("Network error. Please check your connection and try again.");
+      }
       console.error("Signup error:", error);
     } finally {
+      clearTimeout(slowTimer);
       setLoading(false);
+      setSlowServer(false);
     }
   };
 
@@ -193,8 +212,15 @@ function Signup() {
               disabled={loading}
               className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 sm:py-3.5 rounded-lg font-semibold hover:shadow-lg transition-all text-sm sm:text-base disabled:from-blue-400 disabled:to-blue-400 disabled:cursor-not-allowed"
             >
-              {loading ? "Creating Account..." : "Sign Up"}
+              {loading ? (slowServer ? "⏳ Server starting up..." : "Creating Account...") : "Sign Up"}
             </button>
+
+            {/* Cold start warning */}
+            {slowServer && (
+              <p className="text-center text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-1">
+                🔄 Server is waking up (free tier). This may take up to 30 seconds — please wait...
+              </p>
+            )}
           </form>
 
           {/* Login link */}

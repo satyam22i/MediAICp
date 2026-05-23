@@ -18,7 +18,7 @@ export const signup = async (req, res) => {
         // Resend verification email if unverified
         const verificationToken = crypto.randomBytes(32).toString('hex');
         userExists.verificationToken = verificationToken;
-        userExists.name = fullName; // Update name if they changed it
+        userExists.name = fullName;
         userExists.password = password; // Pre-save hook will hash it
         await userExists.save();
         
@@ -26,12 +26,13 @@ export const signup = async (req, res) => {
           await sendVerificationEmail(email, verificationToken);
           return res.status(200).json({ message: 'Account exists but unverified. A new verification link has been sent to your email.' });
         } catch (emailErr) {
-          console.error("SMTP Error:", emailErr.message);
-          console.log(`\n\n=== DEV VERIFICATION LINK ===\nhttp://localhost:5173/verify-email?token=${verificationToken}\n=============================\n\n`);
-          return res.status(200).json({ message: 'Account unverified. Email failed to send due to SMTP error, but a verification link was printed to your backend console.' });
+          console.error("SMTP Error (signup resend):", emailErr.message);
+          return res.status(500).json({ 
+            message: 'Could not send verification email. Please check your email settings or try again later.'
+          });
         }
       }
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: 'An account with this email already exists. Please login.' });
     }
 
     const verificationToken = crypto.randomBytes(32).toString('hex');
@@ -47,13 +48,14 @@ export const signup = async (req, res) => {
       try {
         await sendVerificationEmail(email, verificationToken);
         res.status(201).json({
-          message: 'Signup successful! Please check your email to verify your account.',
+          message: 'Signup successful! Please check your email (and spam folder) to verify your account before logging in.',
         });
       } catch (emailErr) {
-        console.error("SMTP Error:", emailErr.message);
-        console.log(`\n\n=== DEV VERIFICATION LINK ===\nhttp://localhost:5173/verify-email?token=${verificationToken}\n=============================\n\n`);
-        res.status(201).json({
-          message: 'Signup successful! Email failed to send due to SMTP error. Check your backend console for the verification link.',
+        console.error("SMTP Error (signup verify):", emailErr.message);
+        // Delete the user so they can try again when email is fixed
+        await User.findByIdAndDelete(user._id);
+        res.status(500).json({ 
+          message: 'Account created but verification email could not be sent. Please try again or contact support.'
         });
       }
     } else {
@@ -69,7 +71,7 @@ export const verifyEmail = async (req, res) => {
 
   try {
     const user = await User.findOne({ verificationToken: token });
-    if (!user) return res.status(400).json({ message: 'Invalid or expired token' });
+    if (!user) return res.status(400).json({ message: 'Invalid or expired verification link. Please sign up again.' });
 
     user.isVerified = true;
     user.verificationToken = undefined;
@@ -89,7 +91,9 @@ export const login = async (req, res) => {
 
     if (user && (await user.matchPassword(password))) {
       if (!user.isVerified) {
-        return res.status(401).json({ message: 'Please verify your email before logging in. Check your inbox for the link.' });
+        return res.status(401).json({ 
+          message: 'Your email is not verified yet. Please check your inbox for the verification link.'
+        });
       }
 
       res.json({
@@ -110,7 +114,7 @@ export const forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: 'User not found with this email' });
+    if (!user) return res.status(404).json({ message: 'No account found with this email address.' });
 
     // Generate 6 digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -120,11 +124,17 @@ export const forgotPassword = async (req, res) => {
 
     try {
       await sendOTPEmail(email, otp);
-      res.json({ message: 'OTP sent to your email. It is valid for 10 minutes.' });
+      res.json({ message: 'OTP sent! Please check your email inbox and spam folder. It is valid for 10 minutes.' });
     } catch (emailErr) {
-      console.error("SMTP Error:", emailErr.message);
-      console.log(`\n\n=== DEV PASSWORD RESET OTP ===\nOTP: ${otp}\n==============================\n\n`);
-      res.json({ message: 'Email failed to send due to SMTP error. Check your backend console for the OTP.' });
+      console.error("SMTP Error (forgot password):", emailErr.message);
+      // Clear the OTP since we cannot deliver it
+      user.resetPasswordOTP = undefined;
+      user.resetPasswordOTPExpires = undefined;
+      await user.save();
+
+      res.status(500).json({ 
+        message: 'Could not send OTP email. This is a server configuration issue — please try again later or contact support.'
+      });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -140,7 +150,7 @@ export const resetPassword = async (req, res) => {
       resetPasswordOTPExpires: { $gt: Date.now() }
     });
 
-    if (!user) return res.status(400).json({ message: 'Invalid or expired OTP' });
+    if (!user) return res.status(400).json({ message: 'Invalid or expired OTP. Please request a new one.' });
 
     user.password = newPassword;
     user.resetPasswordOTP = undefined;
