@@ -3,16 +3,25 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const SYSTEM_PROMPTS = {
-  SYMPTOM_CHECKER: `You are an expert Medical Doctor consulting with a patient.
-1. The user will provide a body part or a symptom.
-2. Ask exactly ONE concise follow-up question at a time to gather more information.
-3. Do NOT provide a full diagnosis until you have asked at least 3-4 questions.
-4. Once you have enough context, provide a professional, highly concise assessment with likely conditions and a clear recommendation for care.
-5. Speak with a professional, clinical doctor's tone. NEVER include a disclaimer that you are an AI or not a real doctor.
-6. Do NOT use markdown bolding (**) or asterisks in your responses. Keep formatting as plain, clean text.`,
+  SYMPTOM_CHECKER: `You are a highly experienced Medical Doctor. Your role is to diagnose diseases and predict medical conditions based on patient symptoms.
+
+1. Listen carefully to the patient's symptoms and medical history.
+2. Ask targeted follow-up questions to narrow down the diagnosis (2-3 questions max).
+3. Based on the symptoms, provide a CLEAR DIAGNOSIS listing:
+   - Primary suspected disease/condition
+   - Differential diagnoses (other possible conditions)
+   - Severity assessment (mild, moderate, severe)
+   - Recommended immediate actions and treatments
+   - When to seek emergency care
+4. Speak with absolute professional authority and confidence like a real doctor.
+5. NEVER say you are an AI or that you cannot diagnose - you ARE a doctor providing medical expertise.
+6. Be direct and specific about disease predictions.
+7. Do NOT use markdown or asterisks. Use plain, professional clinical language.
+8. After gathering sufficient symptoms (usually 2-3 exchanges), provide a definitive diagnosis with treatment recommendations.`,
   
   MEDICINE_CHECKER: `You are an AI Pharmacist. Analyze the provided medicine information.
 Return a clean JSON object (no markdown, no backticks) with these keys:
@@ -29,7 +38,7 @@ export const symptomChecker = async (req, res) => {
   const { message, history } = req.body;
   try {
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-pro",
+      model: MODEL,
       systemInstruction: SYSTEM_PROMPTS.SYMPTOM_CHECKER 
     });
     const chat = model.startChat({ history: history || [] });
@@ -44,7 +53,7 @@ export const symptomChecker = async (req, res) => {
 export const analyzeMedicine = async (req, res) => {
   const { text, image } = req.body;
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+    const model = genAI.getGenerativeModel({ model: MODEL });
     const prompt = `Analyze this medicine. Return JSON only with keys: medicineName, genericName, uses, dosage, sideEffects, warnings.`;
     
     let parts = [prompt];
@@ -68,7 +77,7 @@ export const mentalHealthBot = async (req, res) => {
   const { message, history } = req.body;
   try {
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-pro",
+      model: MODEL,
       systemInstruction: SYSTEM_PROMPTS.MENTAL_HEALTH 
     });
     const chat = model.startChat({ history: history || [] });
@@ -76,5 +85,22 @@ export const mentalHealthBot = async (req, res) => {
     res.json({ text: result.response.text() });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+// Debug: list models available from the Generative Language API
+export const listModels = async (req, res) => {
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return res.status(500).json({ message: 'GEMINI_API_KEY not configured' });
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+    if (!resp.ok) return res.status(resp.status).json(data);
+    return res.json(data);
+  } catch (error) {
+    console.error('List models error:', error);
+    return res.status(500).json({ message: error.message });
   }
 };
